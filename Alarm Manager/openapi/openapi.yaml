@@ -1,0 +1,125 @@
+openapi: 3.1.0
+info:
+  title: API Менеджера Сигнализаций
+  version: 0.1.0-mvp
+servers:
+  - url: https://localhost:8443
+paths:
+  /api/v1/ingest/events:
+    post:
+      summary: Приём пакетных событий
+      security: [{ bearerAuth: [] }]
+      responses:
+        '202': { description: Принято }
+  /api/v1/alarms:
+    get:
+      summary: Поиск в каталоге сигнализаций
+      parameters:
+        - in: query
+          name: project
+          schema: { type: string }
+        - in: query
+          name: q
+          schema: { type: string }
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: Успех }
+  /api/v1/alarms/{id}/ack:
+    post:
+      summary: Подтверждение (ACK) сигнализации
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: Успех }
+  /api/v1/alarms/{id}/shelve:
+    post:
+      summary: Временное скрытие (Shelve) сигнализации
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: Успех }
+  /api/v1/alarms/{id}/unshelve:
+    post:
+      summary: Возврат из скрытия (Unshelve)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: Успех }
+  /api/v1/events/stream:
+    get:
+      summary: Поток событий (SSE)
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: Успех }
+  /api/v1/kpi/standard:
+    get:
+      summary: Стандартные KPI
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: Успех }
+  /api/v1/reports/run:
+    post:
+      summary: Запуск отчёта
+      security: [{ bearerAuth: [] }]
+      responses:
+        '202': { description: Принято }
+  /api/v1/trends/series:
+    get:
+      summary: Ряды трендов
+      parameters:
+        - in: query
+          name: tags
+          schema: { type: string }
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+        - in: query
+          name: step
+          schema: { type: string }
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: Успех }
+  /api/v1/workflow/change-threshold:
+    post:
+      summary: Старт процесса изменения уставки
+      security: [{ bearerAuth: [] }]
+      responses:
+        '202': { description: Принято }
+  /api/v1/workflow/approve/{workflowId}:
+    post:
+      summary: Апрув workflow
+      parameters:
+        - in: path
+          name: workflowId
+          required: true
+          schema: { type: string }
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: Успех }
+  /api/v1/audit/search:
+    get:
+      summary: Поиск в аудите
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: Успех }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

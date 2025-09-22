@@ -1,0 +1,94 @@
+services:
+  postgres:
+    image: timescale/timescaledb:2.16.1-pg16
+    environment:
+      POSTGRES_USER: alarm
+      POSTGRES_PASSWORD: alarm
+      POSTGRES_DB: alarm
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U alarm"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2-alpine
+    ports:
+      - "6379:6379"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    volumes:
+      - ./infra/keycloak:/opt/keycloak/data/import
+    ports:
+      - "8444:8080"
+
+  camunda:
+    image: camunda/camunda-bpm-platform:run-7.20.0
+    environment:
+      TZ: UTC
+    ports:
+      - "8088:8080"
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.7
+    environment:
+      CLICKHOUSE_DB: alarm
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    deploy:
+      replicas: 0
+
+  opa:
+    image: openpolicyagent/opa:0.67.1
+    command: ["run", "--server", "/policies/authz.rego"]
+    volumes:
+      - ./policies:/policies:ro
+    ports:
+      - "8181:8181"
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/alarm
+      DB_USER: alarm
+      DB_PASSWORD: alarm
+      OIDC_ISSUER_URI: http://keycloak:8080/realms/alarm
+      OIDC_JWKS_URI: http://keycloak:8080/realms/alarm/protocol/openid-connect/certs
+      OPA_URL: http://opa:8181/v1/data/alarm/authz
+      reports.dir: /worm
+    volumes:
+      - ./artifacts:/worm:rw
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+      opa:
+        condition: service_started
+    ports:
+      - "8443:8443"
+
+  web-ui:
+    build: ./web-ui
+    ports:
+      - "5173:80"
+    environment:
+      VITE_API_URL: http://localhost:8443
+    depends_on:
+      - api-gateway
+
+volumes:
+  pgdata:

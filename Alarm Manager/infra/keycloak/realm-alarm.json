@@ -1,0 +1,65 @@
+{
+  "realm": "alarm",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "alarm-ui",
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": ["http://localhost:5173/*"],
+      "webOrigins": ["+"]
+    },
+    {
+      "clientId": "alarm-api",
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "redirectUris": ["http://localhost:8443/*"],
+      "webOrigins": ["+"]
+    }
+  ],
+  "roles": {
+    "realm": [
+      {"name": "operator"},
+      {"name": "engineer"},
+      {"name": "auditor"},
+      {"name": "admin"}
+    ]
+  },
+  "users": [
+    {
+      "username": "operator1",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{"type": "password", "value": "operator", "temporary": false}],
+      "realmRoles": ["operator"],
+      "attributes": { "projects": ["demo-project"] }
+    },
+    {
+      "username": "auditor1",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{"type": "password", "value": "auditor", "temporary": false}],
+      "realmRoles": ["auditor"],
+      "attributes": { "projects": ["demo-project"] }
+    }
+  ],
+  "components": {
+    "org.keycloak.storage.UserStorageProvider": [],
+    "org.keycloak.protocol.oidc.mappers.OIDCProtocolMapper": [
+      {
+        "name": "projects-to-resource_access",
+        "providerId": "oidc-hardcoded-claim-mapper",
+        "subType": "ID token",
+        "subComponents": {},
+        "config": {
+          "claim.value": "{\"alarm\":{\"projects\":[\"demo-project\"]}}",
+          "userinfo.token.claim": "true",
+          "id.token.claim": "true",
+          "access.token.claim": "true",
+          "claim.name": "resource_access",
+          "jsonType.label": "JSON"
+        }
+      }
+    ]
+  }
+}
