@@ -1,0 +1,12 @@
+{
+  "name": "alarm-loadgen",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "node index.mjs"
+  },
+  "dependencies": {
+    "node-fetch": "3.3.2"
+  }
+}
