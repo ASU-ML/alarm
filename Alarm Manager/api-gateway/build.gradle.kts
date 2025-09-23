@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
 	kotlin("jvm")
+	kotlin("plugin.spring") version "1.9.25"
 	id("org.springframework.boot")
 	id("io.spring.dependency-management")
 }
@@ -18,6 +19,7 @@ dependencies {
 	implementation(project(":observability"))
 
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")

@@ -49,7 +49,7 @@ class KpiController(private val jdbc: JdbcTemplate) {
 			"""
 			SELECT alarm_id::text, COUNT(*) AS cnt FROM alarm_events WHERE event_type='ALM_IN' AND ts_utc BETWEEN ? AND ? GROUP BY alarm_id ORDER BY cnt DESC LIMIT 10
 			""".trimIndent(),
-			fromTs, toTs
+			arrayOf(fromTs, toTs)
 		) { rs, _ -> mapOf("alarm_id" to rs.getString(1), "count" to rs.getInt(2)) }
 		return mapOf(
 			"alm_rate_per_min" to almRate,

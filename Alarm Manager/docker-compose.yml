@@ -90,5 +90,15 @@ services:
     depends_on:
       - api-gateway
 
+  loadgen:
+    build: ./tools/loadgen
+    environment:
+      API: http://api-gateway:8443
+      PROJECT: demo-project
+      RATE: 600
+      DURATION: 1
+    depends_on:
+      - api-gateway
+
 volumes:
   pgdata:

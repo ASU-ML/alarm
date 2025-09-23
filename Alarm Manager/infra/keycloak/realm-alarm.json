@@ -29,6 +29,9 @@
     {
       "username": "operator1",
       "enabled": true,
+      "firstName": "Operator",
+      "lastName": "One",
+      "email": "operator1@example.com",
       "emailVerified": true,
       "credentials": [{"type": "password", "value": "operator", "temporary": false}],
       "realmRoles": ["operator"],
@@ -37,6 +40,9 @@
     {
       "username": "auditor1",
       "enabled": true,
+      "firstName": "Auditor",
+      "lastName": "One",
+      "email": "auditor1@example.com",
       "emailVerified": true,
       "credentials": [{"type": "password", "value": "auditor", "temporary": false}],
       "realmRoles": ["auditor"],
@@ -44,7 +50,6 @@
     }
   ],
   "components": {
-    "org.keycloak.storage.UserStorageProvider": [],
     "org.keycloak.protocol.oidc.mappers.OIDCProtocolMapper": [
       {
         "name": "projects-to-resource_access",
@@ -52,12 +57,12 @@
         "subType": "ID token",
         "subComponents": {},
         "config": {
-          "claim.value": "{\"alarm\":{\"projects\":[\"demo-project\"]}}",
-          "userinfo.token.claim": "true",
-          "id.token.claim": "true",
-          "access.token.claim": "true",
-          "claim.name": "resource_access",
-          "jsonType.label": "JSON"
+          "claim.value": ["{\"alarm\":{\"projects\":[\"demo-project\"]}}"],
+          "userinfo.token.claim": ["true"],
+          "id.token.claim": ["true"],
+          "access.token.claim": ["true"],
+          "claim.name": ["resource_access"],
+          "jsonType.label": ["JSON"]
         }
       }
     ]

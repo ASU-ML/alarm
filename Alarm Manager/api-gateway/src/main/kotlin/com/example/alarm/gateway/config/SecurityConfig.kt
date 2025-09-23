@@ -7,6 +7,8 @@ import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver
+import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
@@ -29,7 +31,10 @@ class SecurityConfig {
 					.requestMatchers(HttpMethod.GET, "/api/health").permitAll()
 					.anyRequest().authenticated()
 			}
-			.oauth2ResourceServer { it.jwt(Customizer.withDefaults()) }
+			.oauth2ResourceServer { rs ->
+				rs.bearerTokenResolver(queryFriendlyBearerResolver())
+				rs.jwt(Customizer.withDefaults())
+			}
 			.cors { it.configurationSource(corsConfig()) }
 		return http.build()
 	}
@@ -45,5 +50,13 @@ class SecurityConfig {
 		val source = UrlBasedCorsConfigurationSource()
 		source.registerCorsConfiguration("/**", cfg)
 		return source
+	}
+
+	@Bean
+	fun queryFriendlyBearerResolver(): BearerTokenResolver {
+		val base = DefaultBearerTokenResolver()
+		base.setAllowUriQueryParameter(true)
+		base.setBearerTokenHeaderName("Authorization")
+		return base
 	}
 }
